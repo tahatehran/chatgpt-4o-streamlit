@@ -153,11 +153,11 @@ if "messages" not in st.session_state:
 # Display chat messages from history on app rerun
 for message in st.session_state.messages:
 	# if user message, display user content and user image(if uploaded)
-	if st.chat_message(message["role"]) == 'user':
+	if message["role"] == 'user':
 		with st.chat_message(message["role"]):
-			st.markdown(message[0]['text'])
+			st.markdown(message['content'][0]['text'])
 		# display user image in history
-		image_urls = [item['image_url']['url'] for item in message if item['type'] == 'image_url']
+		image_urls = [item['image_url']['url'] for item in message['content'] if item['type'] == 'image_url']
 		if image_urls:
 			st.image(image_urls[0])
 	else:
