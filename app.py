@@ -195,12 +195,13 @@ if prompt:
 			},}
 		user_content.append(content_image)
 		content_type = 'image'
-	user_message = {"role": "user", "content": user_content}
+	user_message = [{"role": "user", "content": user_content}]
 	history_messages = st.session_state.messages
 	system_message = [{"role": "system", "content": system_message}]
 	
 	#system message + latest 2 round dialogues + user input
 	messages = system_message + history_messages[-4:] + user_message
+	
 	# Display assistant response in chat message container
 	with st.chat_message("assistant"):
 		response_content = st.write_stream(get_completion(messages))
