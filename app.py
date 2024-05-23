@@ -24,20 +24,28 @@ def get_supabase_client():
 	supabase = create_client(url, key)
 	return supabase
 
+
 def upload_file_to_supabase_storage(file_obj):
-	path_on_supastorage = os.path.basename(file_obj.name)
-	mime_type, _ = mimetypes.guess_type(file_obj.name)
-	
-	supabase = get_supabase_client()
-	bucket_name = st.secrets["bucket_name"]
+    path_on_supastorage = os.path.basename(file_obj.name)
+    mime_type, _ = mimetypes.guess_type(file_obj.name)
+    
+    supabase = get_supabase_client()
+    bucket_name = st.secrets["bucket_name"]
 
-	bytes_data = file_obj.getvalue()
-	with BytesIO(bytes_data) as f:
-		supabase.storage.from_(bucket_name).upload(file=f,path=path_on_supastorage, file_options={"content-type": mime_type})
-	
-	public_url = supabase.storage.from_(bucket_name).get_public_url(path_on_supastorage)
-	return public_url
+    bytes_data = file_obj.getvalue()
+    with NamedTemporaryFile(delete=False) as temp_file:
+        temp_file.write(bytes_data)
+        temp_file_path = temp_file.name
 
+    try:
+        with open(temp_file_path, "rb") as f:
+            supabase.storage.from_(bucket_name).upload(file=temp_file_path, path=path_on_supastorage, file_options={"content-type": mime_type})
+        
+        public_url = supabase.storage.from_(bucket_name).get_public_url(path_on_supastorage)
+    finally:
+        os.remove(temp_file_path)  # Ensure the temporary file is removed
+
+    return public_url
 
 
 st.title("Echo Bot")
