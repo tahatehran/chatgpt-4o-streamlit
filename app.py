@@ -147,7 +147,6 @@ with st.sidebar:
 			st.image(uploaded_file)
 	else:
 		public_url = ''
-	st.session_state.uploaded_file = None
 
 st.title("ChatGPT-4o")
 
@@ -198,6 +197,7 @@ if prompt:
 			},}
 		user_content.append(content_image)
 		content_type = 'image'
+	st.session_state.uploaded_file = None
 	public_url = ''
 	user_message = [{"role": "user", "content": user_content}]
 	history_messages = st.session_state.messages
