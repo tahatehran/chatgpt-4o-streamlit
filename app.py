@@ -31,7 +31,7 @@ def upload_file_to_supabase_storage(file_obj):
 	supabase = get_supabase_client()
 	bucket_name = st.secrets["bucket_name"]
 
-	bytes_data = uploaded_file.getvalue()
+	bytes_data = file_obj.getvalue()
 	with BytesIO(bytes_data) as f:
 		supabase.storage.from_(bucket_name).upload(file=f,path=path_on_supastorage, file_options={"content-type": mime_type})
 	
