@@ -65,7 +65,7 @@ def upload_file_to_supabase_storage(file_obj):
 	return public_url
 
 
-st.title("Echo Bot")
+st.title("ChatGPT-4o")
 
 # Initialize chat history
 if "messages" not in st.session_state:
@@ -91,22 +91,35 @@ def response_generator():
 		yield word + " "
 		time.sleep(0.05)
 
+# save file to session
+if 'uploaded_file' not in st.session_state:
+	st.session_state.uploaded_file = None
+
 # upload file
 with st.sidebar:
 	uploaded_file = st.file_uploader("Upload File!")
 	if uploaded_file is not None:
 		# display filename
 		# st.write("Filename:", uploaded_file.name)
+		st.session_state.uploaded_file = uploaded_file
 		public_url = upload_file_to_supabase_storage(uploaded_file)
 		print(public_url)
 		if uploaded_file.type.startswith("image/"):
 			st.image(uploaded_file)
 
+prompt = st.chat_input("What is up?")
+
 # React to user input
-if prompt := st.chat_input("What is up?"):
+if prompt:
 	# Display user message in chat message container
 	with st.chat_message("user"):
 		st.markdown(prompt)
+	# if uploaded image, display in message list and remove from sidebar
+	if st.session_state.uploaded_file and st.session_state.uploaded_file.type.startswith("image/"):
+		st.image(st.session_state.uploaded_file)
+		# remove sidebar image
+		st.session_state.uploaded_file = None
+		
     # Add user message to chat history
 	st.session_state.messages.append({"role": "user", "content": prompt})
 	
