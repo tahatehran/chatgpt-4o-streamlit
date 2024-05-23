@@ -6,6 +6,7 @@ from PIL import Image
 import os
 import mimetypes
 from supabase import create_client, Client
+from io import StringIO, BytesIO
 
 
 
