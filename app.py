@@ -208,7 +208,7 @@ if prompt:
 		response_content = st.write_stream(get_completion(messages))
 		
 	# Add user message to chat history
-	st.session_state.messages.append({"role": "user", "content": user_message})
+	st.session_state.messages.append({"role": "user", "content": user_content})
 	# Add assistant response to chat history
 	st.session_state.messages.append({"role": "assistant", "content": response_content})
 
