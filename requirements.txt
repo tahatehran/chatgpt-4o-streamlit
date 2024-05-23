@@ -1,1 +1,5 @@
 streamlit
+google-auth
+google-cloud-storage
+pillow
+supabase
