@@ -26,12 +26,12 @@ def get_supabase_client():
 
 # check if file already exists
 def check_supabase_file_exists(file_path):
-    supabase = get_supabase_client()
-    bucket_name = st.secrets["bucket_name"]
+	supabase = get_supabase_client()
+	bucket_name = st.secrets["bucket_name"]
 	supabase_storage_ls = supabase.storage.from_(bucket_name).list()
-
+	
 	if any(file["name"] == os.path.basename(file_path) for file in supabase_storage_ls):
-	    return True
+		return True
 	else:
 		return False
 
