@@ -145,6 +145,7 @@ with st.sidebar:
 		public_url = upload_file_to_supabase_storage(uploaded_file)
 		if uploaded_file.type.startswith("image/"):
 			st.image(uploaded_file)
+		st.session_state.uploaded_file = None
 	else:
 		public_url = ''
 
