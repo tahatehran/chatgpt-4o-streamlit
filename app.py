@@ -65,26 +65,6 @@ def upload_file_to_supabase_storage(file_obj):
 	return public_url
 
 
-st.title("ChatGPT-4o")
-
-# Initialize chat history
-if "messages" not in st.session_state:
-	st.session_state.messages = []
-
-# Display chat messages from history on app rerun
-for message in st.session_state.messages:
-	# if user message, display user content and user image(if uploaded)
-	if st.chat_message(message["role"]) == 'user':
-		with st.chat_message(message["role"]):
-			st.markdown(message[0]['text'])
-		# display user image in history
-		image_urls = [item['image_url']['url'] for item in message if item['type'] == 'image_url']
-		if image_urls:
-			st.image(image_urls[0])
-	else:
-		with st.chat_message(message["role"]):
-			st.markdown(message["content"])
-
 
 # Define response function
 def get_completion(user_message,history_messages): 
@@ -168,6 +148,27 @@ with st.sidebar:
 		if uploaded_file.type.startswith("image/"):
 			st.image(uploaded_file)
 
+st.title("ChatGPT-4o")
+
+# Initialize chat history
+if "messages" not in st.session_state:
+	st.session_state.messages = []
+
+# Display chat messages from history on app rerun
+for message in st.session_state.messages:
+	# if user message, display user content and user image(if uploaded)
+	if st.chat_message(message["role"]) == 'user':
+		with st.chat_message(message["role"]):
+			st.markdown(message[0]['text'])
+		# display user image in history
+		image_urls = [item['image_url']['url'] for item in message if item['type'] == 'image_url']
+		if image_urls:
+			st.image(image_urls[0])
+	else:
+		with st.chat_message(message["role"]):
+			st.markdown(message["content"])
+
+
 prompt = st.chat_input("What is up?")
 
 # React to user input
@@ -175,22 +176,14 @@ if prompt:
 	# Display user message in chat message container
 	with st.chat_message("user"):
 		st.markdown(prompt)
+	user_message = [{"type": "text", "text": prompt}]
+	content_type = 'text'
 	# if uploaded image, display in message list and remove from sidebar
 	if st.session_state.uploaded_file and st.session_state.uploaded_file.type.startswith("image/"):
 		public_url = upload_file_to_supabase_storage(uploaded_file)
 		print(public_url)
 		st.image(public_url)
 		st.session_state.uploaded_file = None
-
-	# dialogue = []
-    # Add user message to chat history
-	# dialogue.append({"role": "user", "content": prompt})
-
-    user_message = [
-        {"type": "text", "text": text},
-    ]
-    content_type = 'text'
-    if image:
 		content_image = {
 			"type": "image_url",
 			"image_url": {
@@ -198,15 +191,14 @@ if prompt:
 			},}
 		user_message.append(content_image)
 		content_type = 'image'
-
-	st.session_state.messages.append({"role": "user", "content": prompt})
+		
+	# Add user message to chat history
+	st.session_state.messages.append({"role": "user", "content": user_message})
 	
 	# Display assistant response in chat message container
 	with st.chat_message("assistant"):
-		response = st.write_stream(get_completion)
+		response = st.write_stream(get_completion(user_message,st.session_state.messages))
 	# Add assistant response to chat history
-	# dialogue.append({"role": "assistant", "content": response})
 	st.session_state.messages.append({"role": "assistant", "content": response})
-	# st.session_state.messages.append(dialogue)
 
 
