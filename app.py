@@ -4,6 +4,10 @@ import random
 import time
 from PIL import Image
 import os
+import mimetypes
+from supabase import create_client, Client
+
+
 
 # check if image
 def is_image(file_path):
@@ -13,7 +17,6 @@ def is_image(file_path):
     except IOError:
         return False
 
-from supabase import create_client, Client
 def get_supabase_client():
     url = st.secrets['supabase_url']
     key = st.secrets['supabase_key']
