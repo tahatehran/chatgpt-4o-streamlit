@@ -43,6 +43,9 @@ def upload_file_to_supabase_storage(file_obj):
             supabase.storage.from_(bucket_name).upload(file=temp_file_path, path=path_on_supastorage, file_options={"content-type": mime_type})
         
         public_url = supabase.storage.from_(bucket_name).get_public_url(path_on_supastorage)
+    except StorageException as e:
+        print("StorageException:", e)
+        raise
     finally:
         os.remove(temp_file_path)  # Ensure the temporary file is removed
 
