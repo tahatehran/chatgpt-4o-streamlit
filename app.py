@@ -39,30 +39,30 @@ def check_supabase_file_exists(file_path):
 def upload_file_to_supabase_storage(file_obj):
 	base_name = os.path.basename(file_obj.name)
 	path_on_supastorage = os.path.splitext(base_name)[0] + '_' + str(round(time.time()))  + os.path.splitext(base_name)[1]
-    mime_type, _ = mimetypes.guess_type(file_obj.name)
-    
-    supabase = get_supabase_client()
-    bucket_name = st.secrets["bucket_name"]
-
-    bytes_data = file_obj.getvalue()
-    with NamedTemporaryFile(delete=False) as temp_file:
-        temp_file.write(bytes_data)
-        temp_file_path = temp_file.name
-
-    try:
-        with open(temp_file_path, "rb") as f:
+	mime_type, _ = mimetypes.guess_type(file_obj.name)
+	
+	supabase = get_supabase_client()
+	bucket_name = st.secrets["bucket_name"]
+	
+	bytes_data = file_obj.getvalue()
+	with NamedTemporaryFile(delete=False) as temp_file:
+		temp_file.write(bytes_data)
+		temp_file_path = temp_file.name
+	
+	try:
+		with open(temp_file_path, "rb") as f:
 			if check_supabase_file_exists(path_on_supastorage):
-  				public_url = supabase.storage.from_(bucket_name).get_public_url(path_on_supastorage)
+				public_url = supabase.storage.from_(bucket_name).get_public_url(path_on_supastorage)
 			else:
-            	supabase.storage.from_(bucket_name).upload(file=temp_file_path, path=path_on_supastorage, file_options={"content-type": mime_type})
-        		public_url = supabase.storage.from_(bucket_name).get_public_url(path_on_supastorage)
-    except StorageException as e:
-        print("StorageException:", e)
-        raise
-    finally:
-        os.remove(temp_file_path)  # Ensure the temporary file is removed
-
-    return public_url
+				supabase.storage.from_(bucket_name).upload(file=temp_file_path, path=path_on_supastorage, file_options={"content-type": mime_type})
+				public_url = supabase.storage.from_(bucket_name).get_public_url(path_on_supastorage)
+	except StorageException as e:
+		print("StorageException:", e)
+		raise
+	finally:
+		os.remove(temp_file_path)  # Ensure the temporary file is removed
+	
+	return public_url
 
 
 st.title("Echo Bot")
