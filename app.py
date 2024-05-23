@@ -119,6 +119,7 @@ if prompt:
 		st.image(st.session_state.uploaded_file)
 		# remove sidebar image
 		st.session_state.uploaded_file = None
+		st.experimental_rerun()
 		
     # Add user message to chat history
 	st.session_state.messages.append({"role": "user", "content": prompt})
@@ -129,10 +130,4 @@ if prompt:
 	# Add assistant response to chat history
 	st.session_state.messages.append({"role": "assistant", "content": response})
 
-
-# rerender siderbar
-with st.sidebar:
-	if st.session_state.uploaded_file is not None:
-		if st.session_state.uploaded_file.type.startswith("image/"):
-			st.image(st.session_state.uploaded_file)
 
