@@ -24,8 +24,8 @@ def get_supabase_client():
 	return supabase
 
 def upload_file_to_supabase_storage(file_path):
-	path_on_supastorage = os.path.basename(file_path)
-	mime_type, _ = mimetypes.guess_type(file_path)
+	path_on_supastorage = os.path.basename(file_path.name)
+	mime_type, _ = mimetypes.guess_type(file_path.name)
 	
 	supabase = get_supabase_client()
 	bucket_name = st.secrets["bucket_name"]
