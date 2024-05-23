@@ -142,8 +142,11 @@ with st.sidebar:
 		# display filename
 		# st.write("Filename:", uploaded_file.name)
 		st.session_state.uploaded_file = uploaded_file
+		public_url = upload_file_to_supabase_storage(uploaded_file)
 		if uploaded_file.type.startswith("image/"):
 			st.image(uploaded_file)
+	else:
+		public_url = ''
 	st.session_state.uploaded_file = None
 
 st.title("ChatGPT-4o")
@@ -185,11 +188,8 @@ if prompt:
 	user_content = [{"type": "text", "text": prompt}]
 	content_type = 'text'
 	# if uploaded image, display in message list and remove from sidebar
-	if 'uploaded_file' in st.session_state and st.session_state.uploaded_file and st.session_state.uploaded_file.type.startswith("image/"):
-		public_url = upload_file_to_supabase_storage(uploaded_file)
-		print(public_url)
+	if public_url:
 		st.image(public_url)
-		del st.session_state.uploaded_file
 		# st.session_state.uploaded_file = None
 		content_image = {
 			"type": "image_url",
@@ -198,6 +198,7 @@ if prompt:
 			},}
 		user_content.append(content_image)
 		content_type = 'image'
+	public_url = ''
 	user_message = [{"role": "user", "content": user_content}]
 	history_messages = st.session_state.messages
 	system_message = [{"role": "system", "content": system_message}]
