@@ -117,9 +117,10 @@ if prompt:
 	# if uploaded image, display in message list and remove from sidebar
 	if st.session_state.uploaded_file and st.session_state.uploaded_file.type.startswith("image/"):
 		st.image(st.session_state.uploaded_file)
-		# remove sidebar image
-		st.session_state.uploaded_file = None
-		st.experimental_rerun()
+		with st.sidebar:
+			# remove sidebar image
+			st.session_state.uploaded_file = None
+		
 		
     # Add user message to chat history
 	st.session_state.messages.append({"role": "user", "content": prompt})
