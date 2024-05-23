@@ -8,6 +8,8 @@ import mimetypes
 from supabase import create_client, Client, StorageException
 from io import StringIO, BytesIO
 from tempfile import NamedTemporaryFile
+import json
+import requests
 
 
 # check if image
