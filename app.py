@@ -29,6 +29,13 @@ def response_generator():
 		yield word + " "
 		time.sleep(0.05)
 
+# upload file
+uploaded_file = st.file_uploader("Upload File!")
+if uploaded_file is not None:
+    # display filename
+    st.write("Filename:", uploaded_file.name)
+    if uploaded_file.type.startswith("image/"):
+        st.image(uploaded_file)
 
 
 # React to user input
