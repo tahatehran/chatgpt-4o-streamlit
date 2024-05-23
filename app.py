@@ -180,7 +180,7 @@ if prompt:
 	# Display user message in chat message container
 	with st.chat_message("user"):
 		st.markdown(prompt)
-	user_message = [{"type": "text", "text": prompt}]
+	user_content = [{"type": "text", "text": prompt}]
 	content_type = 'text'
 	# if uploaded image, display in message list and remove from sidebar
 	if st.session_state.uploaded_file and st.session_state.uploaded_file.type.startswith("image/"):
@@ -193,9 +193,9 @@ if prompt:
 			"image_url": {
 				"url": image,
 			},}
-		user_message.append(content_image)
+		user_content.append(content_image)
 		content_type = 'image'
-
+	user_message = {"role": "user", "content": user_content}
 	history_messages = st.session_state.messages
 	system_message = [{"role": "system", "content": system_message}]
 	
