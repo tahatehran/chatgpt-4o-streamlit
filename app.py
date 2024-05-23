@@ -86,49 +86,49 @@ def upload_file_to_supabase_storage(file_obj):
 
 # Define response function
 def get_completion(messages):     
-    
-    # headers
-    openai_api_key = st.secrets['openai_api_key']
-    base_url = st.secrets['base_url']
-    headers = {
-      'Authorization': f'Bearer {openai_api_key}'
-    }
+	
+	# headers
+	openai_api_key = st.secrets['openai_api_key']
+	base_url = st.secrets['base_url']
+	headers = {
+	  'Authorization': f'Bearer {openai_api_key}'
+	}
 
-    temperature = 0.7
-    max_tokens = 2048
-    print(messages)
-    # request body
-    data = {
-        'model': 'gpt-4o',  # we use gpt-4o here
-        'messages': messages,
-        'temperature':temperature, 
-        'max_tokens':max_tokens,
-        'stream':True,
-        # 'stream_options':{"include_usage": True}, # retrieving token usage for stream response
-    }
+	temperature = 0.7
+	max_tokens = 2048
+	print(messages)
+	# request body
+	data = {
+		'model': 'gpt-4o',  # we use gpt-4o here
+		'messages': messages,
+		'temperature':temperature, 
+		'max_tokens':max_tokens,
+		'stream':True,
+		# 'stream_options':{"include_usage": True}, # retrieving token usage for stream response
+	}
 
-    # get response with stream
-    response = requests.post(base_url, headers=headers, json=data,stream=True)
-    response_content = ""
-    for line in response.iter_lines():
-        line = line.decode().strip()
-        if line == "data: [DONE]":
-            continue
-        elif line.startswith("data: "):
-            line = line[6:] # remove prefix "data: "
-            try:
+	# get response with stream
+	response = requests.post(base_url, headers=headers, json=data,stream=True)
+	response_content = ""
+	for line in response.iter_lines():
+		line = line.decode().strip()
+		if line == "data: [DONE]":
+			continue
+		elif line.startswith("data: "):
+			line = line[6:] # remove prefix "data: "
+			try:
 				data = json.loads(line)
 				if "delta" in data["choices"][0]:
 					content = data["choices"][0]["delta"].get("content", "")
 					# response_content += content
 					# yield response_content
 					yield content
-            except json.JSONDecodeError:
-                print(f"Error decoding line: {line}")
+			except json.JSONDecodeError:
+				print(f"Error decoding line: {line}")
 
-    # print(response_content)
-    # print('-----------------------------------\n')
-    # response_data = {}
+	# print(response_content)
+	# print('-----------------------------------\n')
+	# response_data = {}
     
 
 # save file to session
