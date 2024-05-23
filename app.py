@@ -32,8 +32,8 @@ def upload_file_to_supabase_storage(file_obj):
 	bucket_name = st.secrets["bucket_name"]
 
 	bytes_data = uploaded_file.getvalue()
-	f = BytesIO(bytes_data)
-	supabase.storage.from_(bucket_name).upload(file=f,path=path_on_supastorage, file_options={"content-type": mime_type})
+	with BytesIO(bytes_data) as f:
+		supabase.storage.from_(bucket_name).upload(file=f,path=path_on_supastorage, file_options={"content-type": mime_type})
 	
 	public_url = supabase.storage.from_(bucket_name).get_public_url(path_on_supastorage)
 	return public_url
