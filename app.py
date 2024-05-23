@@ -131,7 +131,7 @@ def get_completion(messages):
 	# response_data = {}
     
 
-# save file to session
+# Initialize file uploader
 if 'uploaded_file' not in st.session_state:
 	st.session_state.uploaded_file = None
 
@@ -145,7 +145,6 @@ with st.sidebar:
 		public_url = upload_file_to_supabase_storage(uploaded_file)
 		if uploaded_file.type.startswith("image/"):
 			st.image(uploaded_file)
-		st.session_state.uploaded_file = None
 	else:
 		public_url = ''
 
@@ -188,9 +187,9 @@ if prompt:
 	user_content = [{"type": "text", "text": prompt}]
 	content_type = 'text'
 	# if uploaded image, display in message list and remove from sidebar
-	if public_url:
+	if uploaded_file and uploaded_file.type.startswith("image/"):
 		st.image(public_url)
-		# st.session_state.uploaded_file = None
+
 		content_image = {
 			"type": "image_url",
 			"image_url": {
@@ -198,7 +197,8 @@ if prompt:
 			},}
 		user_content.append(content_image)
 		content_type = 'image'
-	st.session_state.uploaded_file = None
+		st.session_state.uploaded_file = None
+		uploaded_file = None
 	public_url = ''
 	user_message = [{"role": "user", "content": user_content}]
 	history_messages = st.session_state.messages
