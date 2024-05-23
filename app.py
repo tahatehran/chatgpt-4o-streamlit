@@ -192,7 +192,7 @@ if prompt:
 		content_image = {
 			"type": "image_url",
 			"image_url": {
-				"url": image,
+				"url": public_url,
 			},}
 		user_content.append(content_image)
 		content_type = 'image'
