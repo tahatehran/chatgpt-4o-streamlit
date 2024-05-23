@@ -5,10 +5,9 @@ import time
 from PIL import Image
 import os
 import mimetypes
-from supabase import create_client, Client
+from supabase import create_client, Client, StorageException
 from io import StringIO, BytesIO
 from tempfile import NamedTemporaryFile
-
 
 
 # check if image
