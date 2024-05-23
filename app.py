@@ -23,14 +23,14 @@ def get_supabase_client():
 	supabase = create_client(url, key)
 	return supabase
 
-def upload_file_to_supabase_storage(file_path):
-	path_on_supastorage = os.path.basename(file_path.name)
-	mime_type, _ = mimetypes.guess_type(file_path.name)
+def upload_file_to_supabase_storage(file_obj):
+	path_on_supastorage = os.path.basename(file_obj.name)
+	mime_type, _ = mimetypes.guess_type(file_obj.name)
 	
 	supabase = get_supabase_client()
 	bucket_name = st.secrets["bucket_name"]
 	
-	with open(file_path, 'rb') as f:
+	with file_obj as f:
 		supabase.storage.from_(bucket_name).upload(file=f,path=path_on_supastorage, file_options={"content-type": mime_type})
 	
 	public_url = supabase.storage.from_(bucket_name).get_public_url(path_on_supastorage)
