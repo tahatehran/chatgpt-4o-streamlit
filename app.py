@@ -184,7 +184,7 @@ if prompt:
 	user_content = [{"type": "text", "text": prompt}]
 	content_type = 'text'
 	# if uploaded image, display in message list and remove from sidebar
-	if st.session_state.uploaded_file and st.session_state.uploaded_file.type.startswith("image/"):
+	if 'uploaded_file' in st.session_state and st.session_state.uploaded_file and st.session_state.uploaded_file.type.startswith("image/"):
 		public_url = upload_file_to_supabase_storage(uploaded_file)
 		print(public_url)
 		st.image(public_url)
