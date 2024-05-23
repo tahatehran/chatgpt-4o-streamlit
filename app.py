@@ -117,18 +117,18 @@ def get_completion(messages):
         elif line.startswith("data: "):
             line = line[6:] # remove prefix "data: "
             try:
-                data = json.loads(line)
-                if "delta" in data["choices"][0]:
-                    content = data["choices"][0]["delta"].get("content", "")
-                    # response_content += content
-                    # yield response_content
+				data = json.loads(line)
+				if "delta" in data["choices"][0]:
+					content = data["choices"][0]["delta"].get("content", "")
+					# response_content += content
+					# yield response_content
 					yield content
             except json.JSONDecodeError:
                 print(f"Error decoding line: {line}")
 
-    print(response_content)
-    print('-----------------------------------\n')
-    response_data = {}
+    # print(response_content)
+    # print('-----------------------------------\n')
+    # response_data = {}
     
 
 # save file to session
