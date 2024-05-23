@@ -188,7 +188,8 @@ if prompt:
 		public_url = upload_file_to_supabase_storage(uploaded_file)
 		print(public_url)
 		st.image(public_url)
-		st.session_state.uploaded_file = None
+		del st.session_state.uploaded_file
+		# st.session_state.uploaded_file = None
 		content_image = {
 			"type": "image_url",
 			"image_url": {
