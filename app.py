@@ -24,9 +24,23 @@ def get_supabase_client():
 	supabase = create_client(url, key)
 	return supabase
 
+# check if file already exists
+def check_supabase_file_exists(file_path):
+    supabase = get_supabase_client()
+    bucket_name = st.secrets["bucket_name"]
+	supabase_storage_ls = supabase.storage.from_(bucket_name).list()
+
+	if any(file["name"] == os.path.basename(file_path) for file in supabase_storage_ls):
+	    return True
+	else:
+		return False
+
 
 def upload_file_to_supabase_storage(file_obj):
-    path_on_supastorage = os.path.basename(file_obj.name)
+    if file_obj is None:
+        return None
+	base_name = os.path.basename(file_obj.name)
+    path_on_supastorage = os.path.splitext(base_name)[0] + '_' + str(round(time.time()))  + os.path.splitext(base_name)[1]
     mime_type, _ = mimetypes.guess_type(file_obj.name)
     
     supabase = get_supabase_client()
@@ -39,9 +53,11 @@ def upload_file_to_supabase_storage(file_obj):
 
     try:
         with open(temp_file_path, "rb") as f:
-            supabase.storage.from_(bucket_name).upload(file=temp_file_path, path=path_on_supastorage, file_options={"content-type": mime_type})
-        
-        public_url = supabase.storage.from_(bucket_name).get_public_url(path_on_supastorage)
+			if check_supabase_file_exists(path_on_supastorage):
+  				public_url = supabase.storage.from_(bucket_name).get_public_url(path_on_supastorage)
+			else:
+            	supabase.storage.from_(bucket_name).upload(file=temp_file_path, path=path_on_supastorage, file_options={"content-type": mime_type})
+        		public_url = supabase.storage.from_(bucket_name).get_public_url(path_on_supastorage)
     except StorageException as e:
         print("StorageException:", e)
         raise
