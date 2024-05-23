@@ -73,23 +73,86 @@ if "messages" not in st.session_state:
 
 # Display chat messages from history on app rerun
 for message in st.session_state.messages:
-	with st.chat_message(message["role"]):
-		st.markdown(message["content"])
+	# if user message, display user content and user image(if uploaded)
+	if st.chat_message(message["role"]) == 'user':
+		with st.chat_message(message["role"]):
+			st.markdown(message[0]['text'])
+		# display user image in history
+		image_urls = [item['image_url']['url'] for item in message if item['type'] == 'image_url']
+		if image_urls:
+			st.image(image_urls[0])
+	else:
+		with st.chat_message(message["role"]):
+			st.markdown(message["content"])
 
 
 # Define response function
-# Streamed response emulator
-def response_generator():
-	response = random.choice(
-	[
-            "Hello there! How can I assist you today?",
-            "Hi, human! Is there anything I can help you with?",
-            "Do you need help?",
-        ]
-	)
-	for word in response.split():
-		yield word + " "
-		time.sleep(0.05)
+def get_completion(user_message,history_messages): 
+    history_openai_format = []
+    for human, assistant in history:
+        # check if there is image info in the history message or empty history messages
+        
+        if isinstance(human, tuple) or human == "" or assistant is None:
+            continue
+            
+        history_openai_format.append({"role": "user", "content": human })
+        history_openai_format.append({"role": "assistant", "content":assistant})
+    history_openai_format.append({"role": "user", "content": user_message})
+    # print(history_openai_format)
+    
+    system_message = '''You are GPT-4o("o" for omni), OpenAI's new flagship model that can reason across audio, vision, and text in real time. 
+    GPT-4o matches GPT-4 Turbo performance on text in English and code, with significant improvement on text in non-English languages, while also being much faster. 
+    GPT-4o is especially better at vision and audio understanding compared to existing models.
+    GPT-4o's text and image capabilities are avaliable for users now. More capabilities like audio and video will be rolled out iteratively in the future.
+    '''
+
+    
+    # headers
+    openai_api_key = os.environ.get('openai_api_key')
+    base_url = os.environ.get('base_url')
+    headers = {
+      'Authorization': f'Bearer {openai_api_key}'
+    }
+
+    temperature = 0.7
+    max_tokens = 2048
+
+    init_message = [{"role": "system", "content": system_message}]
+    messages = init_message + history_openai_format[-5:] #system message + latest 2 round dialogues + user input
+    print(messages)
+    # request body
+    data = {
+        'model': 'gpt-4o',  # we use gpt-4o here
+        'messages': messages,
+        'temperature':temperature, 
+        'max_tokens':max_tokens,
+        'stream':True,
+        # 'stream_options':{"include_usage": True}, # retrieving token usage for stream response
+    }
+
+    # get response with stream
+    response = requests.post(base_url, headers=headers, json=data,stream=True)
+    response_content = ""
+    for line in response.iter_lines():
+        line = line.decode().strip()
+        if line == "data: [DONE]":
+            continue
+        elif line.startswith("data: "):
+            line = line[6:] # remove prefix "data: "
+            try:
+                data = json.loads(line)
+                if "delta" in data["choices"][0]:
+                    content = data["choices"][0]["delta"].get("content", "")
+                    response_content += content
+                    yield response_content
+            except json.JSONDecodeError:
+                print(f"Error decoding line: {line}")
+
+    print(response_content)
+    print('-----------------------------------\n')
+    response_data = {}
+    
+    supabase_insert_message(user_message,response_content,messages,response_data,user_name,user_oauth_token,ip,sign,cookie_value,content_type)
 
 # save file to session
 if 'uploaded_file' not in st.session_state:
@@ -102,8 +165,6 @@ with st.sidebar:
 		# display filename
 		# st.write("Filename:", uploaded_file.name)
 		st.session_state.uploaded_file = uploaded_file
-		public_url = upload_file_to_supabase_storage(uploaded_file)
-		print(public_url)
 		if uploaded_file.type.startswith("image/"):
 			st.image(uploaded_file)
 
@@ -116,19 +177,36 @@ if prompt:
 		st.markdown(prompt)
 	# if uploaded image, display in message list and remove from sidebar
 	if st.session_state.uploaded_file and st.session_state.uploaded_file.type.startswith("image/"):
-		st.image(st.session_state.uploaded_file)
-		with st.sidebar:
-			# remove sidebar image
-			st.session_state.uploaded_file = None
-		
-		
+		public_url = upload_file_to_supabase_storage(uploaded_file)
+		print(public_url)
+		st.image(public_url)
+		st.session_state.uploaded_file = None
+
+	# dialogue = []
     # Add user message to chat history
+	# dialogue.append({"role": "user", "content": prompt})
+
+    user_message = [
+        {"type": "text", "text": text},
+    ]
+    content_type = 'text'
+    if image:
+		content_image = {
+			"type": "image_url",
+			"image_url": {
+				"url": image,
+			},}
+		user_message.append(content_image)
+		content_type = 'image'
+
 	st.session_state.messages.append({"role": "user", "content": prompt})
 	
 	# Display assistant response in chat message container
 	with st.chat_message("assistant"):
-		response = st.write_stream(response_generator())
+		response = st.write_stream(get_completion)
 	# Add assistant response to chat history
+	# dialogue.append({"role": "assistant", "content": response})
 	st.session_state.messages.append({"role": "assistant", "content": response})
+	# st.session_state.messages.append(dialogue)
 
 
