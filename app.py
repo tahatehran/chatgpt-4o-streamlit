@@ -24,6 +24,22 @@ def get_supabase_client():
 	supabase = create_client(url, key)
 	return supabase
 
+# insert data to database
+def supabase_insert_message(user_message,response_content,messages,content_type,service_channel):
+    supabase = get_supabase_client()
+    data, count = supabase.table('messages').insert({"user_message": user_message, "response_content": response_content,"messages":messages,"content_type":content_type,"service_channel":service_channel}).execute()
+
+def supabase_insert_user(name,user_name,profile,picture,oauth_token):
+    supabase = get_supabase_client()
+    data, count = supabase.table('users').insert({"name":name,"user_name":user_name,"profile":profile,"picture":picture,"oauth_token":oauth_token}).execute()
+
+
+def supabase_fetch_user(user_name):
+    supabase = get_supabase_client()
+    data,count = supabase.table('users').select("*").eq('user_name',user_name).execute()
+    return data
+        
+
 # check if file already exists
 def check_supabase_file_exists(file_path):
 	supabase = get_supabase_client()
@@ -67,38 +83,17 @@ def upload_file_to_supabase_storage(file_obj):
 
 
 # Define response function
-def get_completion(user_message,history_messages): 
-    history_openai_format = []
-    for human, assistant in history:
-        # check if there is image info in the history message or empty history messages
-        
-        if isinstance(human, tuple) or human == "" or assistant is None:
-            continue
-            
-        history_openai_format.append({"role": "user", "content": human })
-        history_openai_format.append({"role": "assistant", "content":assistant})
-    history_openai_format.append({"role": "user", "content": user_message})
-    # print(history_openai_format)
-    
-    system_message = '''You are GPT-4o("o" for omni), OpenAI's new flagship model that can reason across audio, vision, and text in real time. 
-    GPT-4o matches GPT-4 Turbo performance on text in English and code, with significant improvement on text in non-English languages, while also being much faster. 
-    GPT-4o is especially better at vision and audio understanding compared to existing models.
-    GPT-4o's text and image capabilities are avaliable for users now. More capabilities like audio and video will be rolled out iteratively in the future.
-    '''
-
+def get_completion(messages):     
     
     # headers
-    openai_api_key = os.environ.get('openai_api_key')
-    base_url = os.environ.get('base_url')
+    openai_api_key = st.secrets['openai_api_key']
+    base_url = st.secrets['base_url']
     headers = {
       'Authorization': f'Bearer {openai_api_key}'
     }
 
     temperature = 0.7
     max_tokens = 2048
-
-    init_message = [{"role": "system", "content": system_message}]
-    messages = init_message + history_openai_format[-5:] #system message + latest 2 round dialogues + user input
     print(messages)
     # request body
     data = {
@@ -132,7 +127,6 @@ def get_completion(user_message,history_messages):
     print('-----------------------------------\n')
     response_data = {}
     
-    supabase_insert_message(user_message,response_content,messages,response_data,user_name,user_oauth_token,ip,sign,cookie_value,content_type)
 
 # save file to session
 if 'uploaded_file' not in st.session_state:
@@ -169,6 +163,14 @@ for message in st.session_state.messages:
 			st.markdown(message["content"])
 
 
+
+system_message = '''You are GPT-4o("o" for omni), OpenAI's new flagship model that can reason across audio, vision, and text in real time. 
+GPT-4o matches GPT-4 Turbo performance on text in English and code, with significant improvement on text in non-English languages, while also being much faster. 
+GPT-4o is especially better at vision and audio understanding compared to existing models.
+GPT-4o's text and image capabilities are avaliable for users now. More capabilities like audio and video will be rolled out iteratively in the future.
+'''
+
+
 prompt = st.chat_input("What is up?")
 
 # React to user input
@@ -191,14 +193,24 @@ if prompt:
 			},}
 		user_message.append(content_image)
 		content_type = 'image'
+
+	history_messages = st.session_state.messages
+	system_message = [{"role": "system", "content": system_message}]
+	
+	#system message + latest 2 round dialogues + user input
+    messages = system_message + history_messages[-4:] + user_message 
+	# Display assistant response in chat message container
+	with st.chat_message("assistant"):
+		response_content = st.write_stream(get_completion(messages))
 		
 	# Add user message to chat history
 	st.session_state.messages.append({"role": "user", "content": user_message})
-	
-	# Display assistant response in chat message container
-	with st.chat_message("assistant"):
-		response = st.write_stream(get_completion(user_message,st.session_state.messages))
 	# Add assistant response to chat history
-	st.session_state.messages.append({"role": "assistant", "content": response})
+	st.session_state.messages.append({"role": "assistant", "content": response_content})
+
+	# insert messages to database
+	supabase_insert_message(user_message,response_content,messages,content_type,service_channel="streamlit")
+
+
 
 
