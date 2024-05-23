@@ -29,29 +29,27 @@ def response_generator():
 		yield word + " "
 		time.sleep(0.05)
 
-
-col1,col2 = st.columns([0.2,0.8])
-
-with col1:
+# upload file
+with st.sidebar:
 	uploaded_file = st.file_uploader("Upload File!")
 	if uploaded_file is not None:
-	    # display filename
-	    # st.write("Filename:", uploaded_file.name)
-	    if uploaded_file.type.startswith("image/"):
-	        st.image(uploaded_file)
+		# display filename
+		# st.write("Filename:", uploaded_file.name)
+		if uploaded_file.type.startswith("image/"):
+			st.image(uploaded_file)
 					   
-with col2:
-	# React to user input
-	if prompt := st.chat_input("What is up?"):
-		# Display user message in chat message container
-		with st.chat_message("user"):
-			st.markdown(prompt)
-	    # Add user message to chat history
-		st.session_state.messages.append({"role": "user", "content": prompt})
-		
-		# Display assistant response in chat message container
-		with st.chat_message("assistant"):
-			response = st.write_stream(response_generator())
-		# Add assistant response to chat history
-		st.session_state.messages.append({"role": "assistant", "content": response})
+
+# React to user input
+if prompt := st.chat_input("What is up?"):
+	# Display user message in chat message container
+	with st.chat_message("user"):
+		st.markdown(prompt)
+    # Add user message to chat history
+	st.session_state.messages.append({"role": "user", "content": prompt})
+	
+	# Display assistant response in chat message container
+	with st.chat_message("assistant"):
+		response = st.write_stream(response_generator())
+	# Add assistant response to chat history
+	st.session_state.messages.append({"role": "assistant", "content": response})
 
