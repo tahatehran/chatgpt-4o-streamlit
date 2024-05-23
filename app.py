@@ -37,10 +37,8 @@ def check_supabase_file_exists(file_path):
 
 
 def upload_file_to_supabase_storage(file_obj):
-    if file_obj is None:
-        return None
 	base_name = os.path.basename(file_obj.name)
-    path_on_supastorage = os.path.splitext(base_name)[0] + '_' + str(round(time.time()))  + os.path.splitext(base_name)[1]
+	path_on_supastorage = os.path.splitext(base_name)[0] + '_' + str(round(time.time()))  + os.path.splitext(base_name)[1]
     mime_type, _ = mimetypes.guess_type(file_obj.name)
     
     supabase = get_supabase_client()
