@@ -3,6 +3,7 @@ import numpy as np
 import random
 import time
 from PIL import Image
+import os
 
 # check if image
 def is_image(file_path):
