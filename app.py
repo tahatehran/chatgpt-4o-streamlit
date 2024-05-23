@@ -144,6 +144,7 @@ with st.sidebar:
 		st.session_state.uploaded_file = uploaded_file
 		if uploaded_file.type.startswith("image/"):
 			st.image(uploaded_file)
+	st.session_state.uploaded_file = None
 
 st.title("ChatGPT-4o")
 
