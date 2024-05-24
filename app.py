@@ -13,6 +13,25 @@ import requests
 import unicodedata
 
 
+import streamlit as st
+import logging
+
+# 配置日志记录
+logging.basicConfig(
+    format='%(asctime)s - %(message)s',
+    level=logging.INFO,
+    handlers=[
+        logging.FileHandler("app.log"),
+        logging.StreamHandler()
+    ]
+)
+
+logger = logging.getLogger(__name__)
+
+
+logger.info("This is an info message")
+logger.error("This is an error message")
+
 
 # check if image
 def is_image(file_path):
@@ -114,12 +133,14 @@ def get_completion(messages):
 
 	# get response with stream
 	response = requests.post(base_url, headers=headers, json=data,stream=True,timeout=(5,20))
+	logger.info(f"Request to  returned status code: {response.status_code}")
 	response_content = ""
 	for line in response.iter_lines():
 		line = line.decode().strip()
 		if line == "data: [DONE]":
 			continue
 		elif line.startswith("data: "):
+			logger.info("This is each line log: ",line)
 			line = line[6:] # remove prefix "data: "
 			try:
 				data = json.loads(line)
