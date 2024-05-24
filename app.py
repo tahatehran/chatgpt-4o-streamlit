@@ -145,8 +145,12 @@ with st.sidebar:
 	You can use the text and image capabilities now. More capabilities like audio and video will be rolled out iteratively in the future. Stay tuned.
 	"""
 	st.markdown(about)
+
+	st.divider()
+
+	st.markdown("Upload image to your chat.")
 	file_uploader_key = str(st.session_state.get('file_uploader_key', ''))
-	uploaded_file = st.file_uploader("Upload File to your chat", key=file_uploader_key)
+	uploaded_file = st.file_uploader("Upload File", key=file_uploader_key)
 	if uploaded_file is not None:
 		# display filename
 		# st.write("Filename:", uploaded_file.name)
