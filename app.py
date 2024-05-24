@@ -11,26 +11,18 @@ from tempfile import NamedTemporaryFile
 import json
 import requests
 import unicodedata
-
-
-import streamlit as st
 import logging
 
-# 配置日志记录
-logging.basicConfig(
-    format='%(asctime)s - %(message)s',
-    level=logging.INFO,
-    handlers=[
-        logging.FileHandler("app.log"),
-        logging.StreamHandler()
-    ]
-)
 
+# 配置日志记录器
 logger = logging.getLogger(__name__)
+logger.setLevel(logging.DEBUG)
 
-
-logger.info("This is an info message")
-logger.error("This is an error message")
+# 创建一个控制台日志处理器
+console_handler = logging.StreamHandler()
+console_formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
+console_handler.setFormatter(console_formatter)
+logger.addHandler(console_handler)
 
 
 # check if image
@@ -251,7 +243,12 @@ if prompt:
 	
 	# Display assistant response in chat message container
 	with st.chat_message("assistant"):
-		response_content = st.write_stream(get_completion(messages))
+		try:
+			response_content = st.write_stream(get_completion(messages))
+		except Exception as e:
+			logger.ERROR(e)
+			response_content = "opps! something wrong, please try again"
+			st.markdown(response_content)
 		
 	# Add user message to chat history
 	st.session_state.messages.append({"role": "user", "content": user_content})
