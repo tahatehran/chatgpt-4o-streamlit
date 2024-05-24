@@ -137,8 +137,16 @@ if 'uploaded_file' not in st.session_state:
 
 # upload file
 with st.sidebar:
+	about = """
+	# ChatGPT-4o
+	
+	This is GPT-4o, **totally free** for now!
+	
+	You can use the text and image capabilities now. More capabilities like audio and video will be rolled out iteratively in the future. Stay tuned.
+	"""
+	st.markdown(about)
 	file_uploader_key = str(st.session_state.get('file_uploader_key', ''))
-	uploaded_file = st.file_uploader("Upload File!", key=file_uploader_key)
+	uploaded_file = st.file_uploader("Upload File to your chat", key=file_uploader_key)
 	if uploaded_file is not None:
 		# display filename
 		# st.write("Filename:", uploaded_file.name)
