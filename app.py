@@ -149,7 +149,7 @@ with st.sidebar:
 	st.divider()
 
 	st.markdown("**Buy me a coffee:rose::rose::rose:**")
-	st.image(["https://wbucijybungpjrszikln.supabase.co/storage/v1/object/public/chatgpt-4o/Buy%20Me%20a%20Coffe-qrcode_2860875.png","https://wbucijybungpjrszikln.supabase.co/storage/v1/object/public/chatgpt-4o/_____20240524133215.jpg"],caption=["Paypal","Wechat"])
+	st.image(["https://wbucijybungpjrszikln.supabase.co/storage/v1/object/public/chatgpt-4o/Buy%20Me%20a%20Coffe-qrcode_2860875.png","https://wbucijybungpjrszikln.supabase.co/storage/v1/object/public/chatgpt-4o/_____20240524133837.jpg"],caption=["Paypal","Wechat"])
 	st.divider()
 
 	# file uploader
