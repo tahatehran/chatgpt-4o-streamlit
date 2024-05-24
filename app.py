@@ -148,7 +148,7 @@ with st.sidebar:
 
 	st.divider()
 
-	st.markdown("Upload image to your chat.")
+	st.markdown("**Upload image to your chat.**")
 	file_uploader_key = str(st.session_state.get('file_uploader_key', ''))
 	uploaded_file = st.file_uploader("Upload File", key=file_uploader_key)
 	if uploaded_file is not None:
