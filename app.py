@@ -137,7 +137,8 @@ if 'uploaded_file' not in st.session_state:
 
 # upload file
 with st.sidebar:
-	uploaded_file = st.file_uploader("Upload File!")
+	file_uploader_key = str(st.session_state.get('file_uploader_key', ''))
+	uploaded_file = st.file_uploader("Upload File!", key=file_uploader_key)
 	if uploaded_file is not None:
 		# display filename
 		# st.write("Filename:", uploaded_file.name)
@@ -145,6 +146,7 @@ with st.sidebar:
 		public_url = upload_file_to_supabase_storage(uploaded_file)
 		if uploaded_file.type.startswith("image/"):
 			st.image(uploaded_file)
+		st.session_state['file_uploader_key'] = st.session_state.get('file_uploader_key', '') + 'new'
 	else:
 		public_url = ''
 
@@ -187,7 +189,7 @@ if prompt:
 	user_content = [{"type": "text", "text": prompt}]
 	content_type = 'text'
 	# if uploaded image, display in message list and remove from sidebar
-	if uploaded_file and uploaded_file.type.startswith("image/"):
+	if st.session_state.uploaded_file and st.session_state.uploaded_file.type.startswith("image/"):
 		st.image(public_url)
 
 		content_image = {
@@ -198,7 +200,6 @@ if prompt:
 		user_content.append(content_image)
 		content_type = 'image'
 		st.session_state.uploaded_file = None
-		uploaded_file = None
 	public_url = ''
 	user_message = [{"role": "user", "content": user_content}]
 	history_messages = st.session_state.messages
