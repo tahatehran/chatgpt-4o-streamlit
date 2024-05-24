@@ -24,6 +24,9 @@ console_formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - 
 console_handler.setFormatter(console_formatter)
 logger.addHandler(console_handler)
 
+logger.info("这是一个信息日志")
+logger.warning("这是一个警告日志")
+logger.error("这是一个错误日志")
 
 # check if image
 def is_image(file_path):
@@ -216,7 +219,7 @@ prompt = st.chat_input("What is up?")
 # React to user input
 if prompt:
 	# Display user message in chat message container
-	logger.info(prompt)
+	logger.info(f"user prompt log: {prompt}")
 	with st.chat_message("user"):
 		st.markdown(prompt)
 	user_content = [{"type": "text", "text": prompt}]
@@ -246,7 +249,7 @@ if prompt:
 		try:
 			response_content = st.write_stream(get_completion(messages))
 		except Exception as e:
-			logger.ERROR(e)
+			logger.error(e)
 			response_content = "opps! something wrong, please try again"
 			st.markdown(response_content)
 		
