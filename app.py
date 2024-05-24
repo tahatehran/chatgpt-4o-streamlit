@@ -18,15 +18,21 @@ import logging
 logger = logging.getLogger(__name__)
 logger.setLevel(logging.DEBUG)
 
+# 清除现有的处理器，避免重复添加
+if logger.hasHandlers():
+    logger.handlers.clear()
+
 # 创建一个控制台日志处理器
 console_handler = logging.StreamHandler()
 console_formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
 console_handler.setFormatter(console_formatter)
 logger.addHandler(console_handler)
 
+# 记录一些日志
 logger.info("这是一个信息日志")
 logger.warning("这是一个警告日志")
 logger.error("这是一个错误日志")
+
 
 # check if image
 def is_image(file_path):
