@@ -149,7 +149,7 @@ with st.sidebar:
 	st.divider()
 
 	st.markdown("**Buy me a coffee with Paypal**")
-	st.image("https://wbucijybungpjrszikln.supabase.co/storage/v1/object/public/chatgpt-4o/Buy%20Me%20a%20Coffe-qrcode_2860875.png")
+	st.image("https://wbucijybungpjrszikln.supabase.co/storage/v1/object/public/chatgpt-4o/Buy%20Me%20a%20Coffe-qrcode_2860875.png",caption="Paypal")
 
 	st.divider()
 
