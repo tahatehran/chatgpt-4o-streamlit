@@ -108,7 +108,7 @@ def get_completion(messages):
 	}
 
 	# get response with stream
-	response = requests.post(base_url, headers=headers, json=data,stream=True)
+	response = requests.post(base_url, headers=headers, json=data,stream=True,timeout=(5,20))
 	response_content = ""
 	for line in response.iter_lines():
 		line = line.decode().strip()
