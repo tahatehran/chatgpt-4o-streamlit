@@ -224,6 +224,7 @@ prompt = st.chat_input("What is up?")
 # React to user input
 if prompt:
 	# Display user message in chat message container
+	logger.info(prompt)
 	with st.chat_message("user"):
 		st.markdown(prompt)
 	user_content = [{"type": "text", "text": prompt}]
