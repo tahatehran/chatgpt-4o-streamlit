@@ -56,7 +56,7 @@ def check_supabase_file_exists(file_path):
 
 def upload_file_to_supabase_storage(file_obj):
 	base_name = os.path.basename(file_obj.name)
-	path_on_supastorage = os.path.splitext(base_name)[0] + '_' + str(round(time.time())//600)  + os.path.splitext(base_name)[1]
+	path_on_supastorage = os.path.splitext(base_name)[0] + '_' + str(round(time.time())//6000)  + os.path.splitext(base_name)[1]
 	mime_type, _ = mimetypes.guess_type(file_obj.name)
 	
 	supabase = get_supabase_client()
@@ -148,6 +148,12 @@ with st.sidebar:
 
 	st.divider()
 
+	st.markdown("Buy me a coffee with Paypal")
+	st.image("https://wbucijybungpjrszikln.supabase.co/storage/v1/object/public/chatgpt-4o/Buy%20Me%20a%20Coffe-qrcode_2860875.png")
+
+	st.divider()
+
+	# file uploader
 	st.markdown("**Upload image to your chat.**")
 	file_uploader_key = str(st.session_state.get('file_uploader_key', ''))
 	uploaded_file = st.file_uploader("Upload File", key=file_uploader_key)
