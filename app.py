@@ -141,7 +141,7 @@ def get_completion(messages):
 		if line == "data: [DONE]":
 			continue
 		elif line.startswith("data: "):
-			logger.info("This is each line log: ",line)
+			logger.info(f"This is each line log: {line}")
 			line = line[6:] # remove prefix "data: "
 			try:
 				data = json.loads(line)
@@ -151,7 +151,7 @@ def get_completion(messages):
 					# yield response_content
 					yield content
 			except json.JSONDecodeError:
-				print(f"Error decoding line: {line}")
+				logger.error(f"Error decoding line: {line}")
 
 	# print(response_content)
 	# print('-----------------------------------\n')
