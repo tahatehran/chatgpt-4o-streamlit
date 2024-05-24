@@ -10,6 +10,8 @@ from io import StringIO, BytesIO
 from tempfile import NamedTemporaryFile
 import json
 import requests
+import unicodedata
+
 
 
 # check if image
@@ -53,14 +55,18 @@ def check_supabase_file_exists(file_path):
 	else:
 		return False
 
+# user unicodedata to remove characters that are not ASCII
+def remove_non_ascii(text):
+    return ''.join(c for c in text if ord(c) < 128)
 
 def upload_file_to_supabase_storage(file_obj):
-	base_name = os.path.basename(file_obj.name)
+	base_name = remove_non_ascii(os.path.basename(file_obj.name))
 	path_on_supastorage = os.path.splitext(base_name)[0] + '_' + str(round(time.time())//6000)  + os.path.splitext(base_name)[1]
-	mime_type, _ = mimetypes.guess_type(file_obj.name)
+	mime_type, _ = mimetypes.guess_type(base_name)
 	
 	supabase = get_supabase_client()
-	bucket_name = st.secrets["bucket_name"]
+	# bucket_name = st.secrets["bucket_name"]
+	bucket_name = "chatgpt-4o"
 	
 	bytes_data = file_obj.getvalue()
 	with NamedTemporaryFile(delete=False) as temp_file:
@@ -81,7 +87,6 @@ def upload_file_to_supabase_storage(file_obj):
 		os.remove(temp_file_path)  # Ensure the temporary file is removed
 	
 	return public_url
-
 
 
 # Define response function
